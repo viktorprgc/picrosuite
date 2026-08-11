@@ -1,8 +1,0 @@
-name: fib
-channels:
-  - conda-forge
-dependencies:
-  - python=3.13
-  - stackview
-  - jupyter
-prefix: /home/vpc/.local/share/miniforge3/envs/fib
