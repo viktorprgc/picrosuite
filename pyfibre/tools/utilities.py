@@ -46,9 +46,28 @@ def smooth_binary(binary, sigma=None):
     return binary
 
 
+def region_check(region, min_size=0, min_frac=0, edges=False, max_x=0, max_y=0):
+    """Return whether input region passes minimum area and average
+    intensity checks"""
 
+    check = True
 
+    if edges:
+        minr, minc, maxr, maxc = region.bbox
+        edge_check = (minr != 0) * (minc != 0)
+        edge_check *= maxr != max_x
+        edge_check *= maxc != max_y
 
+        check *= edge_check
+
+    check *= region.filled_area >= min_size
+
+    if region._intensity_image is not None:
+        region_filter = region.image * region.intensity_image
+        region_frac = region_filter.sum() / region.filled_area
+        check *= region_frac >= min_frac
+
+    return check
 
 
 def region_swap(masks, images, min_sizes, min_fracs):

@@ -18,6 +18,7 @@ from pyfibre.fibers.fibre_utilities import remove_redundant_nodes
 
 logger = logging.getLogger(__name__)
 
+
 def build_network(
     image: np.typing.NDArray,
     scale: float = 1,
@@ -28,7 +29,6 @@ def build_network(
     lmp_thresh: float = 0.15,
     angle_thresh: float = 70,
     r_thresh: float = 7,
-    return_img = False,
 ) -> nx.Graph:
     """
     Uses the FibeR Extraction algorithm to extract a fibre network from
@@ -72,7 +72,7 @@ def build_network(
     # Apply tubeness transform to enhance image fibres"
     image_TB = tubeness(image_scale)
     threshold = hysteresis(image_TB, alpha=alpha)
-    cleaned = remove_small_objects(threshold, max_size=int(64 * scale**2))
+    cleaned = remove_small_objects(threshold, min_size=int(64 * scale**2))
     distance = distance_transform_edt(cleaned)
     smoothed = gaussian_filter(distance, sigma=sigma)
     cleared = clear_border(smoothed)
@@ -115,10 +115,7 @@ def build_network(
 
     network = clean_network(network)
 
-    if return_img:
-        return cleared, network
-    else:
-        return network
+    return network
 
 
 def clean_network(network: nx.Graph, r_thresh: int = 2):
